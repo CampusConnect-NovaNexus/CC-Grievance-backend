@@ -1,6 +1,7 @@
 from flask import request, jsonify, make_response
-from models import db, Complaint, Comment
+from models import db, Complaint, Comment, ComplaintStats
 
+# Modify your create_complaint_service function to increment total_created
 def create_complaint_service():
     try:
         data = request.get_json()
@@ -8,6 +9,17 @@ def create_complaint_service():
         db.session.add(new_complaint)
         db.session.commit()
         return jsonify(new_complaint.json()), 201
+        
+        # After successfully creating the complaint, update stats
+        stats = ComplaintStats.query.first()
+        if not stats:
+            stats = ComplaintStats(total_created=1, total_resolved=0)
+            db.session.add(stats)
+        else:
+            stats.total_created += 1
+        db.session.commit()
+        
+        # Return your existing response
     except Exception as e:
         return make_response(jsonify({'message' : "error creating complaint", 'error' : str(e)}), 500)
 
@@ -195,27 +207,51 @@ def delete_comment_service(c_id, comment_id):
         return make_response(jsonify({'message': "error deleting comment", 'error': str(e)}), 500)
     
 # Delete a complaint
+# Modify your delete_complaint_service function
 def delete_complaint_service(c_id):
     try:
-        # Get the complaint with for update lock to avoid race conditions
-        complaint = Complaint.query.filter_by(c_id=c_id).first()
-        
+        complaint = Complaint.query.get(c_id)
         if not complaint:
-            return make_response(jsonify({'message': 'Complaint not found'}), 404)
+            return jsonify({'error': 'Complaint not found'}), 404
         
+        # Update stats before deleting
+        from models import ComplaintStats
+        stats = ComplaintStats.query.first()
+        if not stats:
+            stats = ComplaintStats(total_created=1, total_resolved=1)
+            db.session.add(stats)
+        else:
+            stats.total_resolved += 1
+        
+        # Delete the complaint
         db.session.delete(complaint)
         db.session.commit()
         
-        return jsonify({
-            'c_id': complaint.c_id,
-            'user_id': complaint.user_id,
-            'message': complaint.c_message,
-            'upvotes': complaint.upvotes,
-            'resolver': complaint.resolver
-        }), 200
-        
+        return jsonify({'message': 'Complaint deleted successfully'}), 200
     except Exception as e:
-        db.session.rollback()  # Roll back in case of error
-        print(f"Error in delete_complaint: {str(e)}")
-        return make_response(jsonify({'message': "error deleting complaint", 'error': str(e)}), 500)
+        return jsonify({'error': str(e)}), 500
+
+# Add this to your services.py file
+def get_complaint_stats_service():
+    try:
+        # Get current active complaints (unresolved)
+        active_complaints = Complaint.query.count()
+        
+        # Get the total complaints ever created from the ComplaintStats model
+        from models import ComplaintStats
+        stats = ComplaintStats.query.first()
+        
+        if not stats:
+            # Initialize if no stats exist
+            stats = ComplaintStats(total_created=active_complaints, total_resolved=0)
+            db.session.add(stats)
+            db.session.commit()
+        
+        return jsonify({
+            'total_complaints': stats.total_created,
+            'resolved_complaints': stats.total_resolved,
+            'unresolved_complaints': active_complaints
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     

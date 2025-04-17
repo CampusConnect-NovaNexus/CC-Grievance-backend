@@ -37,3 +37,9 @@ class Comment(db.Model):
 
     def json(self):
         return {'comment_id': self.comment_id, 'c_id': self.c_id, 'c_message': self.c_message}
+
+# Complaint Statistics Model
+class ComplaintStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    total_created = db.Column(db.Integer, default=0)
+    total_resolved = db.Column(db.Integer, default=0)

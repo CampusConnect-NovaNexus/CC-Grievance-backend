@@ -12,7 +12,7 @@ CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').strip()
 
-from models import db, Complaint, Comment
+from models import db, Complaint, Comment, ComplaintStats
 # migrate = Migrate(app, db)
 
 # Initialize the app with SQLAlchemy
@@ -26,6 +26,11 @@ with app.app_context():
 @app.route('/test', methods=['GET'])
 def test():
     return jsonify({'message': 'Server is running'})
+
+# Get Complaint Statistics
+@app.route('/api/grievance/stats', methods=['GET'])
+def get_complaint_stats():
+    return get_complaint_stats_service()
 
 # Create a complaint
 @app.route('/api/grievance/new_complaint', methods=['POST'])
