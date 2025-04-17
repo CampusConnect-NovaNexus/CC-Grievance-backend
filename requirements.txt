@@ -1,0 +1,7 @@
+Flask
+Flask-CORS
+Flask-Migrate
+flask-sqlalchemy 
+pgvector 
+sentence-transformers 
+psycopg2-binary
