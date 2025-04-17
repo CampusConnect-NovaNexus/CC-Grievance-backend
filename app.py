@@ -1,10 +1,12 @@
+import os
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from dotenv import load_dotenv
 from waitress import serve
 from flask_migrate import Migrate
-import os
 from services import *
+from AI_Services import *
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -71,6 +73,16 @@ def delete_comment_route(c_id, comment_id):
 @app.route('/api/grievance/delete_complaint/<int:c_id>', methods=['DELETE'])
 def delete_complaint_route(c_id):
     return delete_complaint_service(c_id)
+
+# -------- AI Services APIs --------
+
+@app.route("/api/search/embed_store", methods=["POST"])
+def embed_store():
+    return embed_service()
+
+@app.route("/api/search/query", methods=["POST"])
+def query():
+    return query_service()
 
 if __name__ == "__main__":
     serve(app, host="0.0.0.0", port=4000)

@@ -5,3 +5,8 @@ flask-sqlalchemy
 pgvector 
 sentence-transformers 
 psycopg2-binary
+langchain-mistralai
+langchain 
+langchain-community 
+upstash-vector
+waitress
