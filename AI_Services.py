@@ -10,17 +10,19 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 UPSTASH_VECTOR_REST_URL = os.getenv("UPSTASH_VECTOR_REST_URL")
 UPSTASH_VECTOR_REST_TOKEN = os.getenv("UPSTASH_VECTOR_REST_TOKEN")
 
-
+# create embeddings and insert into vector store
 def embed_service():
     try:
         data = request.get_json()
-        text = data["itemDesc"]
+        text = data["c_message"]
+        c_id = data["c_id"]
         
         embeddings = MistralAIEmbeddings(
             model="mistral-embed",
         )
 
-        documents = [Document(page_content=text)]
+        # Store the c_id in the metadata for later retrieval
+        documents = [Document(page_content=text, metadata={"c_id": c_id})]
 
         store = UpstashVectorStore(
             embedding=embeddings
@@ -33,6 +35,7 @@ def embed_service():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+# query vector store and return index for similar complaints
 def query_service():
     try:
         data = request.get_json()
@@ -46,12 +49,18 @@ def query_service():
             embedding=embeddings
         )
 
-        results = store.similarity_search(query_text, k=10)
+        results = store.similarity_search(query_text, k=5)
 
-        # Convert Documents to serializable format
-        serializable_results = [{"page_content": doc.page_content, "metadata": doc.metadata} for doc in results]
+        # Extract c_ids from the metadata of similar documents
+        similar_complaints = []
+        for doc in results:
+            if "c_id" in doc.metadata:
+                similar_complaints.append({
+                    "c_id": doc.metadata["c_id"],
+                    "content_preview": doc.page_content[:100] + "..." if len(doc.page_content) > 100 else doc.page_content
+                })
 
-        return jsonify({"results": serializable_results}), 200
+        return jsonify({"similar_complaints": similar_complaints}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
