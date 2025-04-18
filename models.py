@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 # Create db instance without app
 db = SQLAlchemy()
+""" Both comment and complaint message column names are c_message take care of it in the code."""
 
 # Complaint Model
 class Complaint(db.Model):
@@ -26,7 +27,7 @@ class Complaint(db.Model):
             'resolver': self.resolver
         }
 
-# Comment Model
+# Comment Model 
 class Comment(db.Model):
     __tablename__ = 'comments'
     

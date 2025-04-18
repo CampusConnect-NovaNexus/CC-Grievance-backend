@@ -39,7 +39,7 @@ def embed_service():
 def query_service():
     try:
         data = request.get_json()
-        query_text = data["query"]
+        query_text = data["c_message"]
 
         embeddings = MistralAIEmbeddings(
             model="mistral-embed",

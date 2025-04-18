@@ -76,11 +76,11 @@ def delete_complaint_route(c_id):
 
 # -------- AI Services APIs --------
 
-@app.route("/api/search/embed_store", methods=["POST"])
+@app.route("/api/grievance/ai/embed_store", methods=["POST"])
 def embed_store():
     return embed_service()
 
-@app.route("/api/search/query", methods=["POST"])
+@app.route("/api/grievance/ai/query", methods=["POST"])
 def query():
     return query_service()
 
