@@ -19,10 +19,25 @@ def get_complaint_stats():
 def create_complaint_route():
     return create_complaint_service()
 
+# get all complaints
+@routes_bp.route('/api/grievance/complaints', methods=['GET'])
+def get_all_complaint_route():
+    return get_all_complaint_service()
+
+# get complaint by id
+@routes_bp.route('/api/grievance/complaint/<int:c_id>', methods=['POST'])
+def get_complaint_route(c_id):
+    return get_complaint_service(c_id)
+
 # Upvote a complaint
 @routes_bp.route('/api/grievance/upvote/<int:c_id>', methods=['PUT'])
 def upvote_complaint_route(c_id):
     return upvote_complaint_service(c_id)
+
+# Downvote a complaint
+@routes_bp.route('/api/grievance/downvote/<int:c_id>', methods=['PUT'])
+def downvote_complaint_route(c_id):
+    return downvote_complaint_service(c_id)
 
 # Get number of upvotes for a complaint
 @routes_bp.route('/api/grievance/get_upvotes/<int:c_id>', methods=['GET'])

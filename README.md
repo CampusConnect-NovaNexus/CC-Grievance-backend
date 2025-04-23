@@ -23,7 +23,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Create a Complaint
 
-**Endpoint:** `POST /api/grievance/new_complaint`
+**Endpoint:** `POST /new_complaint`
 
 **Description:** Creates a new complaint in the system.
 
@@ -55,9 +55,71 @@ All endpoints are prefixed with `/api/grievance`
 }
 ```
 
+### Get All Complaints
+
+**Endpoint:** `GET /complaints`
+
+**Description:** Retrieves all complaints in the system.
+
+**Response:**
+- **Status Code:** 200 (OK)
+- **Body:**
+```json
+{
+  "complaints": [
+    {
+      "c_id": "uuid-string",
+      "user_id": "123",
+      "message": "Complaint message",
+      "upvotes": [122, 123, 124],
+      "resolver": [125, 126]
+    },
+    // More complaints...
+  ]
+}
+```
+
+**Error Response:**
+- **Status Code:** 500
+- **Body:**
+```json
+{
+  "message": "error getting complaints",
+  "error": "Error details"
+}
+```
+
+### Get Specific Complaint
+
+**Endpoint:** `POST /complaint/{c_id}`
+
+**Description:** Retrieves a specific complaint by ID.
+
+**URL Parameters:**
+- `c_id`: ID of the complaint
+
+**Response:**
+- **Status Code:** 200 (OK)
+- **Body:**
+```json
+{
+  "complaint": {
+    "c_id": "uuid-string",
+    "user_id": "123",
+    "message": "Complaint message",
+    "upvotes": [122, 123, 124],
+    "resolver": [125, 126]
+  }
+}
+```
+
+**Error Response:**
+- **Status Code:** 404 if complaint not found
+- **Status Code:** 500 for server errors
+
 ### Upvote a Complaint
 
-**Endpoint:** `PUT /api/grievance/upvote/{c_id}`
+**Endpoint:** `PUT /upvote/{c_id}`
 
 **Description:** Adds a user's upvote to a specific complaint.
 
@@ -81,7 +143,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Get Upvotes for a Complaint
 
-**Endpoint:** `GET /api/grievance/get_upvotes/{c_id}`
+**Endpoint:** `GET /get_upvotes/{c_id}`
 
 **Description:** Retrieves the number of upvotes for a specific complaint.
 
@@ -98,7 +160,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Add Resolver to a Complaint
 
-**Endpoint:** `PUT /api/grievance/add_resolver/{c_id}`
+**Endpoint:** `PUT /add_resolver/{c_id}`
 
 **Description:** Adds a user as a resolver for a specific complaint.
 
@@ -122,7 +184,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Add Comment to a Complaint
 
-**Endpoint:** `POST /api/grievance/add_comment/{c_id}`
+**Endpoint:** `POST /add_comment/{c_id}`
 
 **Description:** Adds a comment to a specific complaint.
 
@@ -147,7 +209,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Get Comments for a Complaint
 
-**Endpoint:** `GET /api/grievance/get_comments/{c_id}`
+**Endpoint:** `GET /get_comments/{c_id}`
 
 **Description:** Retrieves all comments for a specific complaint.
 
@@ -164,7 +226,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Delete a Comment
 
-**Endpoint:** `DELETE /api/grievance/delete_comment/{c_id}/{comment_id}`
+**Endpoint:** `DELETE /delete_comment/{c_id}/{comment_id}`
 
 **Description:** Deletes a specific comment from a complaint.
 
@@ -182,7 +244,7 @@ All endpoints are prefixed with `/api/grievance`
 
 ### Delete a Complaint
 
-**Endpoint:** `DELETE /api/grievance/delete_complaint/{c_id}`
+**Endpoint:** `DELETE /delete_complaint/{c_id}`
 
 **Description:** Deletes a specific complaint and all associated comments.
 
@@ -197,15 +259,86 @@ All endpoints are prefixed with `/api/grievance`
 - **Status Code:** 404 if complaint not found
 - **Status Code:** 500 for server errors
 
+## AI Services
+
+### Store Complaint Embeddings
+
+**Endpoint:** `POST /ai/embed_store`
+
+**Description:** Creates and stores vector embeddings for a complaint message to enable similarity search.
+
+**Request Body:**
+```json
+{
+  "c_message": "Complaint message text",
+  "c_id": "complaint-uuid"
+}
+```
+
+**Response:**
+- **Status Code:** 200 (OK)
+- **Body:**
+```json
+{
+  "message": "Successfully inserted vectors"
+}
+```
+
+**Error Response:**
+- **Status Code:** 400 (Bad Request)
+- **Body:**
+```json
+{
+  "error": "Error message"
+}
+```
+
+### Query Similar Complaints
+
+**Endpoint:** `POST /ai/query`
+
+**Description:** Finds complaints with similar content using vector similarity search.
+
+**Request Body:**
+```json
+{
+  "c_message": "Query text to find similar complaints"
+}
+```
+
+**Response:**
+- **Status Code:** 200 (OK)
+- **Body:**
+```json
+{
+  "similar_complaints": [
+    {
+      "c_id": "complaint-uuid",
+      "content_preview": "Preview of the complaint content..."
+    },
+    // More similar complaints...
+  ]
+}
+```
+
+**Error Response:**
+- **Status Code:** 400 (Bad Request)
+- **Body:**
+```json
+{
+  "error": "Error message"
+}
+```
+
 ## Data Models
 
 ### Complaint
 
 ```json
 {
-  "c_id": 1,
-  "user_id": 123,
-  "c_message": "Complaint message",
+  "c_id": "uuid-string",
+  "user_id": "123",
+  "message": "Complaint message",
   "upvotes": [122, 123, 124],
   "resolver": [125, 126]
 }
@@ -215,9 +348,9 @@ All endpoints are prefixed with `/api/grievance`
 
 ```json
 {
-  "comment_id": 1,
-  "c_id": 1,
-  "user_id": 123,
+  "comment_id": "uuid-string",
+  "c_id": "uuid-string",
+  "user_id": "123",
   "c_message": "Comment message"
 }
 ```

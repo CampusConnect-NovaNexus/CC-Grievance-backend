@@ -23,6 +23,29 @@ def create_complaint_service():
     except Exception as e:
         return make_response(jsonify({'message' : "error creating complaint", 'error' : str(e)}), 500)
 
+# Get all complaints
+def get_all_complaint_service():
+    try:
+        complaints = Complaint.query.all()
+
+        # Return your existing response
+        return make_response(jsonify({'complaints' : [complaint.to_dict() for complaint in complaints]}), 200)
+    except Exception as e:
+        return make_response(jsonify({'message' : "error getting complaints", 'error' : str(e)}), 500)
+
+# Get complaint by id
+def get_complaint_service(c_id):
+    try:
+        complaint = Complaint.query.get(c_id)
+        if not complaint:
+            return make_response(jsonify({'message': 'Complaint not found'}), 404)
+        
+        # Return your existing response
+        return make_response(jsonify({'complaint' : complaint.to_dict()}), 200)
+    except Exception as e:
+        return make_response(jsonify({'message' : "error getting complaint", 'error' : str(e)}), 500)
+
+# Upvote a complaint
 def upvote_complaint_service(c_id):
     try:
         data = request.get_json()
@@ -67,6 +90,52 @@ def upvote_complaint_service(c_id):
         db.session.rollback()  # Roll back in case of error
         print(f"Error in upvote_complaint: {str(e)}")
         return make_response(jsonify({'message': "error upvoting complaint", 'error': str(e)}), 500)
+
+# decrease upvote a complaint
+def downvote_complaint_service(c_id):
+    try:
+        data = request.get_json()
+        user_id = data['user_id']
+        
+        # Get the complaint with for update lock to avoid race conditions
+        complaint = Complaint.query.filter_by(c_id=c_id).first()
+        
+        if not complaint:
+            return make_response(jsonify({'message': 'Complaint not found'}), 404)
+        
+        # Initialize upvotes array if it's None
+        if complaint.upvotes is None:
+            complaint.upvotes = []
+        
+        # Convert user_id to int to ensure proper comparison
+        user_id = int(user_id)
+        
+        # Check if user already upvoted
+        if user_id in complaint.upvotes:
+            # Create a new list with the user_id added
+            new_upvotes = complaint.upvotes.copy() if complaint.upvotes else []
+            new_upvotes.remove(user_id)
+            
+            # Update the upvotes field
+            complaint.upvotes = new_upvotes
+            
+            # Commit the changes
+            db.session.commit()
+            
+            print(f"Updated upvotes for complaint {c_id}: {complaint.upvotes}")
+            
+        return jsonify({
+            'c_id': complaint.c_id,
+            'user_id': complaint.user_id,
+            'message': complaint.c_message,
+            'upvotes': complaint.upvotes,
+            'upvote_count': len(complaint.upvotes) if complaint.upvotes else 0
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()  # Roll back in case of error
+        print(f"Error in downvote_complaint: {str(e)}")
+        return make_response(jsonify({'message': "error downvoting complaint", 'error': str(e)}), 500)
 
 # Get number of upvotes for a complaint
 def get_upvotes_service(c_id):
