@@ -29,7 +29,7 @@ def get_all_complaint_service():
         complaints = Complaint.query.all()
 
         # Return your existing response
-        return make_response(jsonify({'complaints' : [complaint.to_dict() for complaint in complaints]}), 200)
+        return make_response(jsonify({'complaints' : [complaint.json() for complaint in complaints]}), 200)
     except Exception as e:
         return make_response(jsonify({'message' : "error getting complaints", 'error' : str(e)}), 500)
 
@@ -41,7 +41,7 @@ def get_complaint_service(c_id):
             return make_response(jsonify({'message': 'Complaint not found'}), 404)
         
         # Return your existing response
-        return make_response(jsonify({'complaint' : complaint.to_dict()}), 200)
+        return make_response(jsonify({'complaint' : complaint.json()}), 200)
     except Exception as e:
         return make_response(jsonify({'message' : "error getting complaint", 'error' : str(e)}), 500)
 
