@@ -10,7 +10,8 @@ class Complaint(db.Model):
 
     user_id = db.Column(db.String, nullable=False)
     c_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4())) 
-    complaint_message = db.Column(db.String(80), nullable=False)
+    complain_title = db.Column(db.String(30), nullable=False)
+    complaint_message = db.Column(db.String(120), nullable=False)
     upvotes = db.Column(ARRAY(db.Integer), default=list)
     resolver = db.Column(ARRAY(db.Integer), default=list, nullable=False)
 
