@@ -24,7 +24,8 @@ class Complaint(db.Model):
         return {
             'c_id': self.c_id,
             'user_id': self.user_id, 
-            'message': self.complaint_message,
+            'title' : self.complaint_title,
+            'description': self.complaint_message,
             'upvotes': self.upvotes,
             'resolver': self.resolver,
             'created_at': self.created_at.isoformat() if self.created_at else None

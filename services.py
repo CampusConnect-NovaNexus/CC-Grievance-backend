@@ -5,7 +5,7 @@ from models import db, Complaint, Comment, ComplaintStats
 def create_complaint_service():
     try:
         data = request.get_json()
-        new_complaint = Complaint(user_id=data['user_id'], complaint_message=data['complaint_message'], complaint_title = data['complaint_title'])
+        new_complaint = Complaint(user_id=data['user_id'], complaint_message=data['description'], complaint_title = data['title'])
         db.session.add(new_complaint)
         db.session.commit()
         return jsonify(new_complaint.json()), 201
