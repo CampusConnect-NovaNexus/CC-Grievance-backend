@@ -7,20 +7,22 @@ def create_complaint_service():
         data = request.get_json()
         new_complaint = Complaint(user_id=data['user_id'], complaint_message=data['description'], complaint_title = data['title'])
         db.session.add(new_complaint)
-        db.session.commit()
-        return jsonify(new_complaint.json()), 201
         
-        # After successfully creating the complaint, update stats
+        # Update stats before committing the transaction
         stats = ComplaintStats.query.first()
         if not stats:
             stats = ComplaintStats(total_created=1, total_resolved=0)
             db.session.add(stats)
         else:
             stats.total_created += 1
+        
+        # Commit all changes in a single transaction
         db.session.commit()
         
-        # Return your existing response
+        # Return the response
+        return jsonify(new_complaint.json()), 201
     except Exception as e:
+        db.session.rollback()  # Roll back in case of error
         return make_response(jsonify({'message' : "error creating complaint", 'error' : str(e)}), 500)
 
 # Get all complaints
@@ -284,10 +286,11 @@ def delete_complaint_service(c_id):
             return jsonify({'error': 'Complaint not found'}), 404
         
         # Update stats before deleting
-        from models import ComplaintStats
         stats = ComplaintStats.query.first()
         if not stats:
-            stats = ComplaintStats(total_created=1, total_resolved=1)
+            # If no stats exist, create them based on the current state
+            total_complaints = Complaint.query.count()
+            stats = ComplaintStats(total_created=total_complaints + 1, total_resolved=1)
             db.session.add(stats)
         else:
             stats.total_resolved += 1
@@ -298,6 +301,7 @@ def delete_complaint_service(c_id):
         
         return jsonify({'message': 'Complaint deleted successfully'}), 200
     except Exception as e:
+        db.session.rollback()  # Roll back in case of error
         return jsonify({'error': str(e)}), 500
 
 # Add this to your services.py file
@@ -307,7 +311,6 @@ def get_complaint_stats_service():
         active_complaints = Complaint.query.count()
         
         # Get the total complaints ever created from the ComplaintStats model
-        from models import ComplaintStats
         stats = ComplaintStats.query.first()
         
         if not stats:
@@ -316,11 +319,23 @@ def get_complaint_stats_service():
             db.session.add(stats)
             db.session.commit()
         
+        # Calculate unresolved complaints as total created minus total resolved
+        unresolved_complaints = stats.total_created - stats.total_resolved
+        
+        # If there's a discrepancy between active_complaints and calculated unresolved_complaints,
+        # update the stats to reflect the actual state
+        if active_complaints != unresolved_complaints:
+            # This means our stats are out of sync, so we'll update them
+            stats.total_created = active_complaints + stats.total_resolved
+            db.session.commit()
+            unresolved_complaints = active_complaints
+        
         return jsonify({
             'total_complaints': stats.total_created,
             'resolved_complaints': stats.total_resolved,
-            'unresolved_complaints': active_complaints
+            'unresolved_complaints': unresolved_complaints
         }), 200
     except Exception as e:
+        db.session.rollback()  # Roll back in case of error
         return jsonify({'error': str(e)}), 500
     
