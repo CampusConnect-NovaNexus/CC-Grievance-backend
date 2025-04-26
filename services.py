@@ -63,8 +63,6 @@ def upvote_complaint_service(c_id):
         if complaint.upvotes is None:
             complaint.upvotes = []
         
-        # Convert user_id to int to ensure proper comparison
-        user_id = int(user_id)
         
         # Check if user already upvoted
         if user_id not in complaint.upvotes:
@@ -83,7 +81,8 @@ def upvote_complaint_service(c_id):
         return jsonify({
             'c_id': complaint.c_id,
             'user_id': complaint.user_id,
-            'message': complaint.c_message,
+            'title': complaint.complaint_title,
+            'description': complaint.complaint_message,
             'upvotes': complaint.upvotes,
             'upvote_count': len(complaint.upvotes) if complaint.upvotes else 0
         }), 200
@@ -109,8 +108,6 @@ def downvote_complaint_service(c_id):
         if complaint.upvotes is None:
             complaint.upvotes = []
         
-        # Convert user_id to int to ensure proper comparison
-        user_id = int(user_id)
         
         # Check if user already upvoted
         if user_id in complaint.upvotes:
@@ -129,7 +126,8 @@ def downvote_complaint_service(c_id):
         return jsonify({
             'c_id': complaint.c_id,
             'user_id': complaint.user_id,
-            'message': complaint.c_message,
+            'title': complaint.complaint_title,
+            'description': complaint.complaint_message,
             'upvotes': complaint.upvotes,
             'upvote_count': len(complaint.upvotes) if complaint.upvotes else 0
         }), 200
