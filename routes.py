@@ -25,46 +25,46 @@ def get_all_complaint_route():
     return get_all_complaint_service()
 
 # get complaint by id
-@routes_bp.route('/api/grievance/complaint/<int:c_id>', methods=['POST'])
+@routes_bp.route('/api/grievance/complaint/<c_id>', methods=['POST'])
 def get_complaint_route(c_id):
     return get_complaint_service(c_id)
 
 # Upvote a complaint
-@routes_bp.route('/api/grievance/upvote/<int:c_id>', methods=['PUT'])
+@routes_bp.route('/api/grievance/upvote/<c_id>', methods=['PUT'])
 def upvote_complaint_route(c_id):
     return upvote_complaint_service(c_id)
 
 # Downvote a complaint
-@routes_bp.route('/api/grievance/downvote/<int:c_id>', methods=['PUT'])
+@routes_bp.route('/api/grievance/downvote/<c_id>', methods=['PUT'])
 def downvote_complaint_route(c_id):
     return downvote_complaint_service(c_id)
 
 # Get number of upvotes for a complaint
-@routes_bp.route('/api/grievance/get_upvotes/<int:c_id>', methods=['GET'])
+@routes_bp.route('/api/grievance/get_upvotes/<c_id>', methods=['GET'])
 def get_upvotes_route(c_id):
     return get_upvotes_service(c_id)
 
 # Add a resolver to a complaint
-@routes_bp.route('/api/grievance/add_resolver/<int:c_id>', methods=['PUT'])
+@routes_bp.route('/api/grievance/add_resolver/<c_id>', methods=['PUT'])
 def add_resolver_route(c_id):
     return add_resolver_service(c_id)
 
 # Add Comment to a complaint
-@routes_bp.route('/api/grievance/add_comment/<int:c_id>', methods=['POST'])
+@routes_bp.route('/api/grievance/add_comment/<c_id>', methods=['POST'])
 def add_comment_route(c_id):
     return add_comment_service(c_id)
 
 # Get all comments for a complaint
-@routes_bp.route('/api/grievance/get_comments/<int:c_id>', methods=['GET'])
+@routes_bp.route('/api/grievance/get_comments/<c_id>', methods=['GET'])
 def get_comments_route(c_id):   
     return get_comments_service(c_id)
 
 # Delete a comment from a complaint
-@routes_bp.route('/api/grievance/delete_comment/<int:c_id>/<int:comment_id>', methods=['DELETE'])
+@routes_bp.route('/api/grievance/delete_comment/<c_id>/<comment_id>', methods=['DELETE'])
 def delete_comment_route(c_id, comment_id):
     return delete_comment_service(c_id, comment_id)
 
 # Delete a complaint
-@routes_bp.route('/api/grievance/delete_complaint/<int:c_id>', methods=['DELETE'])
+@routes_bp.route('/api/grievance/delete_complaint/<c_id>', methods=['DELETE'])
 def delete_complaint_route(c_id):
     return delete_complaint_service(c_id)

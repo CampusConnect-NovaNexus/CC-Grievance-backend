@@ -201,7 +201,7 @@ def add_comment_service(c_id):
     try:
         data = request.get_json()
         user_id = data['user_id']
-        c_message = data['c_message']
+        comment_message = data['comment']
         
         # Get the complaint with for update lock to avoid race conditions
         complaint = Complaint.query.filter_by(c_id=c_id).first()
@@ -210,7 +210,7 @@ def add_comment_service(c_id):
             return make_response(jsonify({'message': 'Complaint not found'}), 404)
         
         # Create a new comment
-        new_comment = Comment(user_id = user_id, c_id=c_id, c_message=c_message)
+        new_comment = Comment(user_id = user_id, c_id=c_id, comment_message=comment_message)
         db.session.add(new_comment)
         
         # Commit the changes
@@ -220,7 +220,7 @@ def add_comment_service(c_id):
             'user_id': new_comment.user_id,
             'comment_id': new_comment.comment_id,
             'c_id': new_comment.c_id,
-            'c_message': new_comment.c_message
+            'comment': new_comment.comment_message
         }), 201
         
     except Exception as e:
@@ -240,8 +240,11 @@ def get_comments_service(c_id):
         
         comments = Comment.query.filter_by(c_id=c_id).all()
         
-        return jsonify({
-            'comments': [comment.json() for comment in comments]
+        if not comments:
+            return make_response(jsonify({'comments': []}), 200)
+        
+        return jsonify({    
+            'comments': [comment.json() for comment in comments]    
         }), 200
         
     except Exception as e:
