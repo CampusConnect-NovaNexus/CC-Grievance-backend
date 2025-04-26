@@ -13,8 +13,8 @@ class Complaint(db.Model):
     c_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4())) 
     complaint_title = db.Column(db.String(30), nullable=False)
     complaint_message = db.Column(db.String(120), nullable=False)
-    upvotes = db.Column(ARRAY(db.Integer), default=list)
-    resolver = db.Column(ARRAY(db.Integer), default=list, nullable=False)
+    upvotes = db.Column(ARRAY(db.String), default=list)
+    resolver = db.Column(ARRAY(db.String), default=list, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  
 
     # Relationship to Comment
