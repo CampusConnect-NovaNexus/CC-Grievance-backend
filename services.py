@@ -1,5 +1,6 @@
 from flask import request, jsonify, make_response
 from models import db, Complaint, Comment, ComplaintStats
+from sqlalchemy.sql import func
 
 # Modify your create_complaint_service function to increment total_created
 def create_complaint_service():
@@ -30,10 +31,27 @@ def get_all_complaint_service():
     try:
         complaints = Complaint.query.all()
 
-        # Return your existing response
-        return make_response(jsonify({'complaints' : [complaint.json() for complaint in complaints]}), 200)
+        # Get the total number of comments for each complaint
+        comment_counts = db.session.query(
+            Comment.c_id, 
+            func.count(Comment.comment_id).label('comment_count')
+        ).group_by(Comment.c_id).all()
+        
+        # Convert to a dictionary for easy lookup
+        comment_counts_dict = {c_id: count for c_id, count in comment_counts}
+        
+        # Prepare the response with complaints and their comment counts
+        complaint_list = []
+        for complaint in complaints:
+            complaint_data = complaint.json()
+            # Add the comment count to each complaint
+            complaint_data['comment_count'] = comment_counts_dict.get(complaint.c_id, 0)
+            complaint_list.append(complaint_data)
+
+        return make_response(jsonify({'complaints': complaint_list}), 200)
     except Exception as e:
-        return make_response(jsonify({'message' : "error getting complaints", 'error' : str(e)}), 500)
+        print(f"Error in get_all_complaint_service: {str(e)}")
+        return make_response(jsonify({'message': "error getting complaints", 'error': str(e)}), 500)
 
 # Get complaint by id
 def get_complaint_service(c_id):
