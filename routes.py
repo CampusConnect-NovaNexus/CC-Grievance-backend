@@ -29,6 +29,11 @@ def get_all_complaint_route():
 def get_complaint_route(c_id):
     return get_complaint_service(c_id)
 
+# get complaint by user id
+@routes_bp.route('/api/grievance/user/<user_id>', methods=['GET'])
+def get_complaint_by_user_route(user_id):
+    return get_complaint_by_user_service(user_id)
+
 # Upvote a complaint
 @routes_bp.route('/api/grievance/upvote/<c_id>', methods=['PUT'])
 def upvote_complaint_route(c_id):
