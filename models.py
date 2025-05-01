@@ -16,6 +16,7 @@ class Complaint(db.Model):
     upvotes = db.Column(ARRAY(db.String), default=list)
     resolver = db.Column(ARRAY(db.String), default=list, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  
+    complaint_image_url = db.Column(db.String(500), nullable=True)
 
     # Relationship to Comment
     comments = db.relationship('Comment', backref='complaint', cascade="all, delete-orphan")
