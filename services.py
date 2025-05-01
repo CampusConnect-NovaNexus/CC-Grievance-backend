@@ -1,14 +1,39 @@
 from flask import request, jsonify, make_response
 from models import db, Complaint, Comment, ComplaintStats
+from image_upload_service import image_upload
 from sqlalchemy.sql import func
 
-# Modify your create_complaint_service function to increment total_created
-def create_complaint_service():
+def create_complaint_service(data):
     try:
-        data = request.get_json()
-        new_complaint = Complaint(user_id=data['user_id'], complaint_message=data['description'], complaint_title = data['title'])
-        db.session.add(new_complaint)
+        complaint_title = data.get('complaint_title')
+        complaint_message = data.get('complaint_message')
+        user_id = data.get('user_id')
+        image_file = data.get('image_file')
+
+        if not complaint_title or not user_id:
+            return make_response(jsonify({'message': 'Missing required fields'}), 400)
+
+        image_url = None
+        if image_file:
+            try:
+                if hasattr(image_file, 'filename') and image_file.filename:
+                    filename = f"{user_id}_{complaint_title}_{image_file.filename}"
+                    upload_response = image_upload(image_file, filename)
+                    if upload_response:
+                        image_url = upload_response.get('url')
+                    print(f"Image URL after upload: {image_url}")
+            except Exception as img_error:
+                print(f"Error processing image: {str(img_error)}")
+
+        new_complaint = Complaint(
+            complaint_title=complaint_title,
+            complaint_message=complaint_message,
+            user_id=user_id,
+            complaint_image_url=image_url,
+        )
         
+        db.session.add(new_complaint)
+
         # Update stats before committing the transaction
         stats = ComplaintStats.query.first()
         if not stats:
@@ -369,4 +394,4 @@ def get_complaint_stats_service():
     except Exception as e:
         db.session.rollback()  # Roll back in case of error
         return jsonify({'error': str(e)}), 500
-    
+
