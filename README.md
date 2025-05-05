@@ -36,23 +36,32 @@ All API endpoints are prefixed with `/api/grievance`.
 - **Endpoint**: `/api/grievance/new_complaint`
 - **Method**: `POST`
 - **Description**: Creates a new complaint in the system.
-- **Request Body**:
+- **Request Body (JSON)**:
   ```json
   {
     "user_id": "user123",
     "complaint_title": "Issue with Campus WiFi",
-    "complaint_message": "The WiFi in the library has been down for two days."
+    "complaint_message": "The WiFi in the library has been down for two days.",
+    "category": "Infrastructure"
   }
   ```
+- **Request Body (Multipart Form Data)**:
+  - `user_id`: ID of the user creating the complaint
+  - `title`: Title of the complaint
+  - `description`: Detailed description of the complaint
+  - `category`: Category of the complaint (optional, defaults to "Others")
+  - `image_file`: Image file related to the complaint (optional)
 - **Response**:
   ```json
   {
     "c_id": "uuid-string",
     "user_id": "user123",
-    "message": "The WiFi in the library has been down for two days.",
+    "title": "Issue with Campus WiFi",
+    "description": "The WiFi in the library has been down for two days.",
     "upvotes": [],
     "resolver": [],
-    "created_at": "2023-06-15T14:30:00Z"
+    "created_at": "2023-06-15T14:30:00Z",
+    "category": "Infrastructure"
   }
   ```
 
@@ -67,10 +76,13 @@ All API endpoints are prefixed with `/api/grievance`.
       {
         "c_id": "uuid-string",
         "user_id": "user123",
-        "message": "The WiFi in the library has been down for two days.",
+        "title": "Issue with Campus WiFi",
+        "description": "The WiFi in the library has been down for two days.",
         "upvotes": [1, 2, 3],
         "resolver": [4],
-        "created_at": "2023-06-15T14:30:00Z"
+        "created_at": "2023-06-15T14:30:00Z",
+        "category": "Infrastructure",
+        "comment_count": 5
       },
       // More complaints...
     ]
@@ -79,7 +91,7 @@ All API endpoints are prefixed with `/api/grievance`.
 
 ### Get Complaint by ID
 - **Endpoint**: `/api/grievance/complaint/<c_id>`
-- **Method**: `POST`
+- **Method**: `GET`
 - **Description**: Retrieves a specific complaint by its ID.
 - **URL Parameters**:
   - `c_id`: The ID of the complaint to retrieve.
@@ -89,10 +101,34 @@ All API endpoints are prefixed with `/api/grievance`.
     "complaint": {
       "c_id": "uuid-string",
       "user_id": "user123",
-      "message": "The WiFi in the library has been down for two days.",
+      "title": "Issue with Campus WiFi",
+      "description": "The WiFi in the library has been down for two days.",
       "upvotes": [1, 2, 3],
       "resolver": [4],
-      "created_at": "2023-06-15T14:30:00Z"
+      "created_at": "2023-06-15T14:30:00Z",
+      "category": "Infrastructure"
+    }
+  }
+  ```
+
+### Get Complaint by User ID
+- **Endpoint**: `/api/grievance/user/<user_id>`
+- **Method**: `GET`
+- **Description**: Retrieves complaints for a specific user.
+- **URL Parameters**:
+  - `user_id`: The ID of the user.
+- **Response**:
+  ```json
+  {
+    "complaint": {
+      "c_id": "uuid-string",
+      "user_id": "user123",
+      "title": "Issue with Campus WiFi",
+      "description": "The WiFi in the library has been down for two days.",
+      "upvotes": [1, 2, 3],
+      "resolver": [4],
+      "created_at": "2023-06-15T14:30:00Z",
+      "category": "Infrastructure"
     }
   }
   ```
@@ -114,7 +150,8 @@ All API endpoints are prefixed with `/api/grievance`.
   {
     "c_id": "uuid-string",
     "user_id": "user123",
-    "message": "The WiFi in the library has been down for two days.",
+    "title": "Issue with Campus WiFi",
+    "description": "The WiFi in the library has been down for two days.",
     "upvotes": [1, 2, 3, 456],
     "upvote_count": 4
   }
@@ -137,7 +174,8 @@ All API endpoints are prefixed with `/api/grievance`.
   {
     "c_id": "uuid-string",
     "user_id": "user123",
-    "message": "The WiFi in the library has been down for two days.",
+    "title": "Issue with Campus WiFi",
+    "description": "The WiFi in the library has been down for two days.",
     "upvotes": [1, 2, 3],
     "upvote_count": 3
   }
@@ -189,7 +227,7 @@ All API endpoints are prefixed with `/api/grievance`.
   ```json
   {
     "user_id": "user456",
-    "c_message": "I'm experiencing the same issue."
+    "comment": "I'm experiencing the same issue."
   }
   ```
 - **Response**:
@@ -198,7 +236,7 @@ All API endpoints are prefixed with `/api/grievance`.
     "user_id": "user456",
     "comment_id": "comment-uuid",
     "c_id": "complaint-uuid",
-    "c_message": "I'm experiencing the same issue."
+    "comment": "I'm experiencing the same issue."
   }
   ```
 
@@ -303,6 +341,13 @@ All API endpoints are prefixed with `/api/grievance`.
 
 All endpoints may return the following error responses:
 
+- **400 Bad Request**:
+  ```json
+  {
+    "message": "Missing required fields"
+  }
+  ```
+
 - **404 Not Found**:
   ```json
   {
@@ -323,11 +368,13 @@ All endpoints may return the following error responses:
 ### Complaint
 - `c_id`: Unique identifier for the complaint (UUID)
 - `user_id`: ID of the user who created the complaint
-- `complain_title`: Title of the complaint (max 30 characters)
+- `complaint_title`: Title of the complaint (max 30 characters)
 - `complaint_message`: Content of the complaint (max 120 characters)
 - `upvotes`: Array of user IDs who upvoted the complaint
 - `resolver`: Array of user IDs who are resolving the complaint
 - `created_at`: Timestamp when the complaint was created
+- `complaint_image_url`: URL to an image related to the complaint (optional)
+- `complaint_category`: Category of the complaint (defaults to "Others")
 
 ### Comment
 - `comment_id`: Unique identifier for the comment (UUID)
