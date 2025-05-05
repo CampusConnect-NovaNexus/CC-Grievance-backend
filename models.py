@@ -17,6 +17,7 @@ class Complaint(db.Model):
     resolver = db.Column(ARRAY(db.String), default=list, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  
     complaint_image_url = db.Column(db.String(500), nullable=True)
+    complaint_category = db.Column(db.String(30), nullable=False, default='Others')
 
     # Relationship to Comment
     comments = db.relationship('Comment', backref='complaint', cascade="all, delete-orphan")
@@ -29,7 +30,8 @@ class Complaint(db.Model):
             'description': self.complaint_message,
             'upvotes': self.upvotes,
             'resolver': self.resolver,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'category' : self.complaint_category
         }
 
 # Comment Model 

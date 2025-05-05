@@ -9,6 +9,7 @@ def create_complaint_service(data):
         complaint_message = data.get('complaint_message')
         user_id = data.get('user_id')
         image_file = data.get('image_file')
+        complaint_category = data.get('category')
 
         if not complaint_title or not user_id:
             return make_response(jsonify({'message': 'Missing required fields'}), 400)
@@ -30,6 +31,7 @@ def create_complaint_service(data):
             complaint_message=complaint_message,
             user_id=user_id,
             complaint_image_url=image_url,
+            complaint_category = complaint_category
         )
         
         db.session.add(new_complaint)
