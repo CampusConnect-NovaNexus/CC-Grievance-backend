@@ -17,18 +17,7 @@ def get_complaint_stats():
 # Create a complaint
 @routes_bp.route('/api/grievance/new_complaint', methods=['POST'])
 def create_complaint_route():
-    if request.content_type and 'multipart/form-data' in request.content_type:
-        data = {
-            'user_id': request.form.get('user_id'),
-            'complaint_message': request.form.get('description'),
-            'complaint_title': request.form.get('title'),
-            'image_file': request.files.get('image_file') if 'image_file' in request.files else None
-        }
-
-        print("Data from form:", data)
-    else:
-        data = request.get_json()
-    return create_complaint_service(data)
+    return create_complaint_service()
 
 # get all complaints
 @routes_bp.route('/api/grievance/complaints', methods=['GET'])
