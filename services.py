@@ -82,12 +82,12 @@ def get_complaint_service(c_id):
 # Get complaint by user id
 def get_complaint_by_user_service(user_id):
     try:
-        complaint = Complaint.query.filter_by(user_id=user_id).first()
+        complaint = Complaint.query.filter_by(user_id=user_id).all()
         if not complaint:
             return make_response(jsonify({'message': 'Complaint not found'}), 404)
         
         # Return your existing response
-        return make_response(jsonify({'complaint' : complaint.json()}), 200)
+        return make_response(jsonify({'complaint' : [c.json() for c in complaint]}), 200)
     except Exception as e:
         return make_response(jsonify({'message' : "error getting complaint", 'error' : str(e)}), 500)
 
