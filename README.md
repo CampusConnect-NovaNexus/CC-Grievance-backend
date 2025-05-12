@@ -1,6 +1,22 @@
-# Grievance System API Documentation
+# Grievance System - CampusConnect
 
-This document provides detailed information about the API endpoints available in the Campus Connect Grievance System backend.
+This service handles the grievance management functionality for the CampusConnect platform. It allows users to submit, track, and resolve complaints, with AI-powered similarity search for related issues.
+
+## Technologies
+- Python 3.x
+- Flask (Web Framework)
+- PostgreSQL with SQLAlchemy ORM
+- pgvector (Vector Database for AI embeddings)
+- LangChain and Mistral AI integration
+- Docker for containerization
+
+## Features
+- Create, read, update, and delete grievance complaints
+- Comment system on complaints
+- Upvoting and resolver management
+- AI-powered complaint similarity search
+- File/image upload support
+- Statistics and reporting
 
 ## Base URL
 
