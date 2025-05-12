@@ -21,5 +21,5 @@ ENV PYTHONUNBUFFERED=1
 # Expose the application port
 EXPOSE 4000
 
-# Run the application with Flask CLI
-CMD ["flask", "run", "--host=0.0.0.0", "--port=7000"]
+# Run the application with Flask
+CMD ["flask", "run", "--host=0.0.0.0", "--port=4000"]
