@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+.env.*
+
+# VS Code
+.vscode/
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# System
+.DS_Store
+Thumbs.db
+
+# AI Models and large files
+*.h5
+*.model
+*.pkl
+models/
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
